@@ -11,24 +11,48 @@ use syn::Token;
 #[proc_macro]
 pub fn dotenv_build(_: TokenStream) -> TokenStream {
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
-        let mut var_stmts = vec![];
-        for l in file {
-            match l {
+        let statements = file
+            .map(|line| match line {
                 Ok((var_name, var_content)) => {
                     let stmt = quote! {
                         std::env::set_var(#var_name, #var_content);
                     };
 
-                    var_stmts.push(stmt);
+                    stmt
                 }
                 Err(e) => {
                     let msg = e.to_string();
-                    return quote! { compile_error!(#msg) }.into();
+                    quote! { compile_error!(#msg) }
                 }
-            };
-        }
+            })
+            .collect::<Vec<proc_macro2::TokenStream>>();
 
-        quote!(#(#var_stmts)*).into()
+        quote!(#(#statements)*).into()
+    } else {
+        panic!("Could not find .env file");
+    }
+}
+
+#[proc_macro]
+pub fn dotenv_module(_: TokenStream) -> TokenStream {
+    if let Ok((_, file)) = dotenv::find::Finder::new().find() {
+        let statements = file
+            .map(|line| match line {
+                Ok((var_name, var_content)) => quote! {
+                    const #var_name: &str = #var_content;
+                },
+
+                Err(e) => {
+                    let msg = e.to_string();
+                    quote! { compile_error!(#msg) }
+                }
+            })
+            .collect::<Vec<proc_macro2::TokenStream>>();
+
+        quote!(mod dotenv_vars {
+                #(#statements)*
+        })
+        .into()
     } else {
         panic!("Could not find .env file");
     }

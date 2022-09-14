@@ -11,7 +11,15 @@ use syn::Token;
 #[proc_macro]
 pub fn dotenv_build(input: TokenStream) -> TokenStream {
     if let Ok((path, file)) = dotenv::find::Finder::new().find() {
-        for l in file {}
+        for l in file {
+            match l {
+                Ok(l) => l,
+                Err(e) => {
+                    let msg = e.to_string();
+                    return quote! { compile_error!(#msg) }.into();
+                }
+            }
+        }
 
         TokenStream::new()
     } else {

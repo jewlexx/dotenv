@@ -24,5 +24,4 @@ edition = "2018"
 proc-macro2 = "1"
 quote = "1"
 syn = "1"
-proc-macro-hack = "0.5"
 dotenv = { version = "0.15", path = "../dotenv" }

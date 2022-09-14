@@ -6,14 +6,38 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::parse::Parser;
 use syn::punctuated::Punctuated;
-use syn::{parse_macro_input, Token};
+use syn::{parse_macro_input, Token, VisPublic, Visibility};
 
 /// Load the dotenv file at build time, and set the environment variables at runtime.
 #[proc_macro]
 pub fn dotenv_build(input: TokenStream) -> TokenStream {
+    let args = if input.is_empty() {
+        (
+            ".env",
+            Visibility::Public(VisPublic {
+                pub_token: syn::token::Pub::default(),
+            }),
+        )
+    } else {
+        let args = Punctuated::<syn::Expr, Token![,]>::parse_terminated
+            .parse(input)
+            .unwrap();
+        let mut iter = args.into_iter();
+        let filename = match iter.next().unwrap() {
+            syn::Expr::Lit(syn::ExprLit {
+                lit: syn::Lit::Str(s),
+                ..
+            }) => s.value(),
+            _ => panic!("expected string literal"),
+        };
+        let visibility: Visibility = syn::parse(iter.next().unwrap()).unwrap();
+        (filename, visibility)
+    };
     let args = syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated
         .parse(input)
         .unwrap();
+
+    for arg in args {}
 
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
         let statements = file

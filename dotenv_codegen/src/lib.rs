@@ -3,7 +3,7 @@ extern crate proc_macro;
 use std::env::{self, VarError};
 
 use proc_macro::TokenStream;
-use quote::quote;
+use quote::{quote, ToTokens};
 use syn::parse::Parser;
 use syn::punctuated::Punctuated;
 use syn::{parse_macro_input, Token, VisPublic, Visibility};
@@ -13,7 +13,7 @@ use syn::{parse_macro_input, Token, VisPublic, Visibility};
 pub fn dotenv_build(input: TokenStream) -> TokenStream {
     let args = if input.is_empty() {
         (
-            ".env",
+            ".env".to_owned(),
             Visibility::Public(VisPublic {
                 pub_token: syn::token::Pub::default(),
             }),
@@ -30,7 +30,9 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
             }) => s.value(),
             _ => panic!("expected string literal"),
         };
-        let visibility: Visibility = syn::parse(iter.next().unwrap()).unwrap();
+        let visibility: Visibility =
+            syn::parse(iter.next().unwrap().to_token_stream().into()).unwrap();
+
         (filename, visibility)
     };
     let args = syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated

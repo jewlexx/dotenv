@@ -38,9 +38,12 @@ pub fn dotenv_module(_: TokenStream) -> TokenStream {
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
         let statements = file
             .map(|line| match line {
-                Ok((var_name, var_content)) => quote! {
-                    const #var_name: &str = #var_content;
-                },
+                Ok((var_name, var_content)) => {
+                    let var_name_tokens: proc_macro2::TokenStream = var_name.parse().unwrap();
+                    quote! {
+                        const #var_name_tokens: &str = #var_content;
+                    }
+                }
 
                 Err(e) => {
                     let msg = e.to_string();

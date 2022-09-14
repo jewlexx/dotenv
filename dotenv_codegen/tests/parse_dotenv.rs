@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate dotenv_codegen;
 
+dotenv_module!();
+
 #[test]
 fn test_vars_at_build() {
     dotenv_build!();

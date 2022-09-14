@@ -9,11 +9,18 @@ use syn::punctuated::Punctuated;
 use syn::Token;
 
 #[proc_macro]
-pub fn dotenv_build(input: TokenStream) -> TokenStream {
-    if let Ok((path, file)) = dotenv::find::Finder::new().find() {
+pub fn dotenv_build(_: TokenStream) -> TokenStream {
+    if let Ok((_, file)) = dotenv::find::Finder::new().find() {
+        let mut var_stmts = vec![];
         for l in file {
-            let line = match l {
-                Ok(l) => l,
+            match l {
+                Ok((var_name, var_content)) => {
+                    let stmt = quote! {
+                        std::env::set_var(#var_name, #var_content);
+                    };
+
+                    var_stmts.push(stmt);
+                }
                 Err(e) => {
                     let msg = e.to_string();
                     return quote! { compile_error!(#msg) }.into();
@@ -21,7 +28,7 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
             };
         }
 
-        quote!().into()
+        quote!(#(#var_stmts)*).into()
     } else {
         panic!("Could not find .env file");
     }

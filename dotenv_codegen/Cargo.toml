@@ -23,5 +23,5 @@ edition = "2018"
 [dependencies]
 proc-macro2 = "1"
 quote = "1"
-syn = "1"
+syn = { version = "1", features = ["full"] }
 dotenv = { version = "0.15", path = "../dotenv" }

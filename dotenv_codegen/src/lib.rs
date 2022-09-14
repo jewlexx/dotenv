@@ -6,11 +6,15 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::parse::Parser;
 use syn::punctuated::Punctuated;
-use syn::Token;
+use syn::{parse_macro_input, Token};
 
 /// Load the dotenv file at build time, and set the environment variables at runtime.
 #[proc_macro]
-pub fn dotenv_build(_: TokenStream) -> TokenStream {
+pub fn dotenv_build(input: TokenStream) -> TokenStream {
+    let args = syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated
+        .parse(input)
+        .unwrap();
+
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
         let statements = file
             .map(|line| match line {
@@ -39,6 +43,8 @@ pub fn dotenv_build(_: TokenStream) -> TokenStream {
 /// Can parse publicity modifier for the module as the first argument.
 #[proc_macro]
 pub fn dotenv_module(input: TokenStream) -> TokenStream {
+    let path = parse_macro_input!(input as syn::LitStr);
+
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
         let vis: syn::Visibility = syn::parse(input).unwrap();
 

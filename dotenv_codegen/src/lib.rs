@@ -12,13 +12,15 @@ use syn::Token;
 pub fn dotenv_build(input: TokenStream) -> TokenStream {
     if let Ok((path, file)) = dotenv::find::Finder::new().find() {
         for l in file {
-            match l {
+            let line = match l {
                 Ok(l) => l,
                 Err(e) => {
                     let msg = e.to_string();
                     return quote! { compile_error!(#msg) }.into();
                 }
-            }
+            };
+
+            println!("{}{}", line.0, line.1)
         }
 
         TokenStream::new()

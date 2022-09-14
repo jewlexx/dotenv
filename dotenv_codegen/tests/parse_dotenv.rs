@@ -10,4 +10,8 @@ fn test_vars_at_build() {
         std::env::var("CODEGEN_TEST_VAR2"),
         Ok("'quotes within quotes'".to_owned())
     );
+    assert_eq!(std::env::var("CODEGEN_TEST_VAR3"), Ok("69".to_owned()));
 }
+
+#[test]
+fn test_vars_in_module() {}

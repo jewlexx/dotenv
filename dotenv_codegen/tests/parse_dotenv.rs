@@ -16,4 +16,9 @@ fn test_vars_at_build() {
 }
 
 #[test]
-fn test_vars_in_module() {}
+fn test_vars_in_module() {
+    use dotenv_vars::*;
+    assert_eq!(CODEGEN_TEST_VAR1, "hello");
+    assert_eq!(CODEGEN_TEST_VAR2, "'quotes within quotes'");
+    assert_eq!(CODEGEN_TEST_VAR3, "69");
+}

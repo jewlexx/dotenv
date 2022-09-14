@@ -34,8 +34,10 @@ pub fn dotenv_build(_: TokenStream) -> TokenStream {
 }
 
 #[proc_macro]
-pub fn dotenv_module(_: TokenStream) -> TokenStream {
+pub fn dotenv_module(input: TokenStream) -> TokenStream {
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
+        let vis: syn::Visibility = syn::parse(input).unwrap();
+
         let statements = file
             .map(|line| match line {
                 Ok((var_name, var_content)) => {
@@ -52,7 +54,7 @@ pub fn dotenv_module(_: TokenStream) -> TokenStream {
             })
             .collect::<Vec<proc_macro2::TokenStream>>();
 
-        quote!(mod dotenv_vars {
+        quote!(#vis mod dotenv_vars {
                 #(#statements)*
         })
         .into()

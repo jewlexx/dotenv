@@ -11,7 +11,6 @@ use syn::Token;
 #[proc_macro]
 pub fn dotenv_build(input: TokenStream) -> TokenStream {
     if let Ok((path, file)) = dotenv::find::Finder::new().find() {
-        let mut strings = vec![];
         for l in file {
             let line = match l {
                 Ok(l) => l,
@@ -20,16 +19,9 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
                     return quote! { compile_error!(#msg) }.into();
                 }
             };
-
-            strings.push(format!("println!({}{});", line.0, line.1));
         }
 
-        return quote! {
-            fn main() {
-                #(#strings)*
-            }
-        }
-        .into();
+        quote!().into()
     } else {
         panic!("Could not find .env file");
     }

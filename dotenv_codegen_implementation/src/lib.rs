@@ -9,6 +9,17 @@ use syn::punctuated::Punctuated;
 use syn::Token;
 
 #[proc_macro]
+pub fn dotenv_build(input: TokenStream) -> TokenStream {
+    if let Ok((path, file)) = dotenv::find::Finder::new().find() {
+        for l in file {}
+
+        TokenStream::new()
+    } else {
+        panic!("Could not find .env file");
+    }
+}
+
+#[proc_macro]
 pub fn dotenv(input: TokenStream) -> TokenStream {
     if let Err(err) = dotenv::dotenv() {
         panic!("Error loading .env file: {}", err);

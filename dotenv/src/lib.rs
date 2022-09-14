@@ -5,8 +5,9 @@
 //! file, if available, and mashes those with the actual environment variables
 //! provided by the operating system.
 
+pub mod find;
+
 mod errors;
-mod find;
 mod iter;
 mod parse;
 

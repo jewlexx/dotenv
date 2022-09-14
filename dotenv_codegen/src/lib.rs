@@ -8,6 +8,7 @@ use syn::parse::Parser;
 use syn::punctuated::Punctuated;
 use syn::Token;
 
+/// Load the dotenv file at build time, and set the environment variables at runtime.
 #[proc_macro]
 pub fn dotenv_build(_: TokenStream) -> TokenStream {
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
@@ -33,6 +34,9 @@ pub fn dotenv_build(_: TokenStream) -> TokenStream {
     }
 }
 
+/// Load the dotenv file at build time, and transform all variables into constants within a module.
+///
+/// Can parse publicity modifier for the module as the first argument.
 #[proc_macro]
 pub fn dotenv_module(input: TokenStream) -> TokenStream {
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
@@ -63,6 +67,7 @@ pub fn dotenv_module(input: TokenStream) -> TokenStream {
     }
 }
 
+/// Find a given variable in the dotenv file at build time
 #[proc_macro]
 pub fn dotenv(input: TokenStream) -> TokenStream {
     if let Err(err) = dotenv::dotenv() {

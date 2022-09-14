@@ -41,7 +41,7 @@ pub fn dotenv_module(_: TokenStream) -> TokenStream {
                 Ok((var_name, var_content)) => {
                     let var_name_tokens: proc_macro2::TokenStream = var_name.parse().unwrap();
                     quote! {
-                        const #var_name_tokens: &str = #var_content;
+                        pub const #var_name_tokens: &str = #var_content;
                     }
                 }
 

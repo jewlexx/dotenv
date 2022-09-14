@@ -5,12 +5,11 @@ use std::io;
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
     LineParse(String, usize),
     Io(io::Error),
     EnvVar(std::env::VarError),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Error {
@@ -42,7 +41,6 @@ impl fmt::Display for Error {
                 "Error parsing line: '{}', error at line index: {}",
                 line, error_index
             ),
-            _ => unreachable!(),
         }
     }
 }

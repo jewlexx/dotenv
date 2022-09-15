@@ -16,8 +16,15 @@ fn test_vars_at_build() {
 }
 
 #[test]
-fn test_invalid_path() {
-    dotenv_build!(filename = ".env.invalid");
+fn test_custom_path() {
+    dotenv_build!(filename = ".env");
+
+    assert_eq!(std::env::var("CODEGEN_TEST_VAR1"), Ok("hello!".to_owned()));
+    assert_eq!(
+        std::env::var("CODEGEN_TEST_VAR2"),
+        Ok("'quotes within quotes'".to_owned())
+    );
+    assert_eq!(std::env::var("CODEGEN_TEST_VAR3"), Ok("69".to_owned()));
 }
 
 #[test]

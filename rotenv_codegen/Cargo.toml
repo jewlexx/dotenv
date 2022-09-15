@@ -25,5 +25,5 @@ edition = "2018"
 proc-macro2 = "1"
 quote = "1"
 syn = { version = "1", features = ["full"] }
-dotenv = { version = "0.15", path = "../dotenv" }
+rotenv = { version = "0.15", path = "../rotenv" }
 litrs = "0.2.3"

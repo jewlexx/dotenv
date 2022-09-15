@@ -1,6 +1,7 @@
 extern crate proc_macro;
 
 use std::env::{self, VarError};
+use std::path::Path;
 
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
@@ -11,13 +12,8 @@ use syn::{parse_macro_input, Token, VisPublic, Visibility};
 /// Load the dotenv file at build time, and set the environment variables at runtime.
 #[proc_macro]
 pub fn dotenv_build(input: TokenStream) -> TokenStream {
-    let (path, visibility) = if input.is_empty() {
-        (
-            ".env".to_owned(),
-            Visibility::Public(VisPublic {
-                pub_token: syn::token::Pub::default(),
-            }),
-        )
+    let path = if input.is_empty() {
+        ".env".to_owned()
     } else {
         let args = Punctuated::<syn::Expr, Token![,]>::parse_terminated
             .parse(input)
@@ -26,19 +22,23 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
         let mut iter = args.into_iter();
 
         let filename = match iter.next().unwrap() {
-            syn::Expr::Assign(syn::ExprAssign {
-                left: syn::Lit::Str()
-                lit: syn::Lit::Str(s),
-                ..
-            }) => s.value(),
+            syn::Expr::Assign(expr) => {
+                if expr.left.to_token_stream().to_string() == "filename".to_owned() {
+                    expr.right.to_token_stream()
+                } else {
+                    quote!(".env")
+                }
+            }
+            _ => panic!(),
         };
-        let visibility: Visibility =
-            syn::parse(iter.next().unwrap().to_token_stream().into()).unwrap();
 
-        (filename, visibility)
+        filename.to_string()
     };
 
-    if let Ok((_, file)) = dotenv::find::Finder::new().find() {
+    if let Ok((_, file)) = dotenv::find::Finder::new()
+        .filename(Path::new(&path))
+        .find()
+    {
         let statements = file
             .map(|line| match line {
                 Ok((var_name, var_content)) => {
@@ -66,8 +66,6 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
 /// Can parse publicity modifier for the module as the first argument.
 #[proc_macro]
 pub fn dotenv_module(input: TokenStream) -> TokenStream {
-    let path = parse_macro_input!(input as syn::LitStr);
-
     if let Ok((_, file)) = dotenv::find::Finder::new().find() {
         let vis: syn::Visibility = syn::parse(input).unwrap();
 

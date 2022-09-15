@@ -16,6 +16,11 @@ fn test_vars_at_build() {
 }
 
 #[test]
+fn test_invalid_path() {
+    dotenv_build!(filename = ".env");
+}
+
+#[test]
 fn test_vars_in_module() {
     use dotenv_vars::*;
     assert_eq!(CODEGEN_TEST_VAR1, "hello!");

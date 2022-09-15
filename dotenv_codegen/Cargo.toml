@@ -25,3 +25,4 @@ proc-macro2 = "1"
 quote = "1"
 syn = { version = "1", features = ["full"] }
 dotenv = { version = "0.15", path = "../dotenv" }
+litrs = "0.2.3"

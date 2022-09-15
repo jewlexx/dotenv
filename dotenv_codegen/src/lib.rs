@@ -21,19 +21,22 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
 
         let mut iter = args.into_iter();
 
-        let filename = match iter.next().unwrap() {
+        match iter.next().unwrap() {
             syn::Expr::Assign(expr) => {
-                if expr.left.to_token_stream().to_string() == "filename".to_owned() {
-                    expr.right.to_token_stream()
+                if expr.left.to_token_stream().to_string() == "filename" {
+                    expr.right.to_token_stream().to_string()
                 } else {
-                    quote!(".env")
+                    ".env".to_owned()
                 }
             }
             _ => panic!(),
-        };
-
-        filename.to_string()
+        }
     };
+
+    return quote! {
+        compile_error!(#path);
+    }
+    .into();
 
     if let Ok((_, file)) = dotenv::find::Finder::new()
         .filename(Path::new(&path))

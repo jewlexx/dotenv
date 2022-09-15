@@ -72,56 +72,72 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
 /// Can parse publicity modifier for the module as the first argument.
 #[proc_macro]
 pub fn dotenv_module(input: TokenStream) -> TokenStream {
-    let (path, visibility) = if input.is_empty() {
-        (
-            ".env".to_owned(),
-            Visibility::Public(VisPublic {
-                pub_token: Default::default(),
-            }),
-        )
-    } else {
+    let mut path = ".env".to_owned();
+    let mut visibility = Visibility::Public(VisPublic {
+        pub_token: Default::default(),
+    });
+
+    if !input.is_empty() {
         let args = Punctuated::<syn::Expr, Token![,]>::parse_terminated
             .parse(input)
             .unwrap();
 
         let mut iter = args.into_iter();
 
-        let vis = match iter.next().unwrap() {
-            syn::Expr::Assign(expr) => {
-                if expr.left.to_token_stream().to_string() == "visibility" {
-                    let literal = expr.right.to_token_stream();
+        for l in iter {
+            match l {
+                syn::Expr::Assign(expr) => {
+                    if expr.left.to_token_stream().to_string() == "visibility" {
+                        let literal = expr.right.to_token_stream();
 
-                    syn::parse(literal.into()).unwrap()
-                } else {
-                    Visibility::Public(VisPublic {
-                        pub_token: Default::default(),
-                    })
+                        syn::parse(literal.into()).unwrap()
+                    } else {
+                        Visibility::Public(VisPublic {
+                            pub_token: Default::default(),
+                        })
+                    }
                 }
-            }
-            _ => panic!(),
-        };
+                _ => panic!(),
+            };
 
-        let path = match iter.next().unwrap() {
-            syn::Expr::Assign(expr) => {
-                if expr.left.to_token_stream().to_string() == "filename" {
-                    let literal =
-                        match litrs::StringLit::parse(expr.right.to_token_stream().to_string()) {
-                            Ok(v) => v,
-                            Err(_) => panic!(),
-                        };
+            let vis = match iter.next().unwrap() {
+                syn::Expr::Assign(expr) => {
+                    if expr.left.to_token_stream().to_string() == "visibility" {
+                        let literal = expr.right.to_token_stream();
 
-                    let value = literal.into_value();
-
-                    value.to_string()
-                } else {
-                    ".env".to_owned()
+                        syn::parse(literal.into()).unwrap()
+                    } else {
+                        Visibility::Public(VisPublic {
+                            pub_token: Default::default(),
+                        })
+                    }
                 }
-            }
-            _ => panic!(),
-        };
+                _ => panic!(),
+            };
 
-        (path, vis)
-    };
+            let path = match iter.next().unwrap() {
+                syn::Expr::Assign(expr) => {
+                    if expr.left.to_token_stream().to_string() == "filename" {
+                        let literal =
+                            match litrs::StringLit::parse(expr.right.to_token_stream().to_string())
+                            {
+                                Ok(v) => v,
+                                Err(_) => panic!(),
+                            };
+
+                        let value = literal.into_value();
+
+                        value.to_string()
+                    } else {
+                        ".env".to_owned()
+                    }
+                }
+                _ => panic!(),
+            };
+
+            (path, vis)
+        }
+    }
 
     if let Ok((_, file)) = dotenv::find::Finder::new()
         .filename(Path::new(&path))

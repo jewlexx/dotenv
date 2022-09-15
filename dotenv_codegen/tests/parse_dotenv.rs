@@ -1,6 +1,10 @@
 #[macro_use]
 extern crate dotenv_codegen;
 
+mod private_module {
+    dotenv_module!(visibility = pub);
+}
+
 dotenv_module!();
 
 #[test]

@@ -1,6 +1,5 @@
 extern crate proc_macro;
 
-use std::convert::TryFrom;
 use std::env::{self, VarError};
 use std::path::Path;
 
@@ -8,7 +7,7 @@ use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
 use syn::parse::Parser;
 use syn::punctuated::Punctuated;
-use syn::{parse_macro_input, Token, VisPublic, Visibility};
+use syn::{Token, VisPublic, Visibility};
 
 /// Load the dotenv file at build time, and set the environment variables at runtime.
 #[proc_macro]
@@ -73,15 +72,67 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
 /// Can parse publicity modifier for the module as the first argument.
 #[proc_macro]
 pub fn dotenv_module(input: TokenStream) -> TokenStream {
-    if let Ok((_, file)) = dotenv::find::Finder::new().find() {
-        let vis: syn::Visibility = syn::parse(input).unwrap();
+    let (path, visibility) = if input.is_empty() {
+        (
+            ".env".to_owned(),
+            Visibility::Public(VisPublic {
+                pub_token: Default::default(),
+            }),
+        )
+    } else {
+        let args = Punctuated::<syn::Expr, Token![,]>::parse_terminated
+            .parse(input)
+            .unwrap();
 
+        let mut iter = args.into_iter();
+
+        let vis = match iter.next().unwrap() {
+            syn::Expr::Assign(expr) => {
+                if expr.left.to_token_stream().to_string() == "visibility" {
+                    let literal = expr.right.to_token_stream();
+
+                    syn::parse(literal.into()).unwrap()
+                } else {
+                    Visibility::Public(VisPublic {
+                        pub_token: Default::default(),
+                    })
+                }
+            }
+            _ => panic!(),
+        };
+
+        let path = match iter.next().unwrap() {
+            syn::Expr::Assign(expr) => {
+                if expr.left.to_token_stream().to_string() == "filename" {
+                    let literal =
+                        match litrs::StringLit::parse(expr.right.to_token_stream().to_string()) {
+                            Ok(v) => v,
+                            Err(_) => panic!(),
+                        };
+
+                    let value = literal.into_value();
+
+                    value.to_string()
+                } else {
+                    ".env".to_owned()
+                }
+            }
+            _ => panic!(),
+        };
+
+        (path, vis)
+    };
+
+    if let Ok((_, file)) = dotenv::find::Finder::new()
+        .filename(Path::new(&path))
+        .find()
+    {
         let statements = file
             .map(|line| match line {
                 Ok((var_name, var_content)) => {
                     let var_name_tokens: proc_macro2::TokenStream = var_name.parse().unwrap();
                     quote! {
-                        pub const #var_name_tokens: &str = #var_content;
+                        #visibility const #var_name_tokens: &str = #var_content;
                     }
                 }
 
@@ -92,7 +143,7 @@ pub fn dotenv_module(input: TokenStream) -> TokenStream {
             })
             .collect::<Vec<proc_macro2::TokenStream>>();
 
-        quote!(#vis mod dotenv_vars {
+        quote!(#visibility mod dotenv_vars {
                 #(#statements)*
         })
         .into()

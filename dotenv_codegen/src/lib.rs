@@ -7,9 +7,11 @@ use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
 use syn::parse::Parser;
 use syn::punctuated::Punctuated;
-use syn::{Token, VisPublic, Visibility};
+use syn::{Token, Visibility};
 
 /// Load the dotenv file at build time, and set the environment variables at runtime.
+///
+/// Can pass `filename = "path/to/.env"` to specify a custom path to the dotenv file.
 #[proc_macro]
 pub fn dotenv_build(input: TokenStream) -> TokenStream {
     let path = if input.is_empty() {
@@ -69,13 +71,12 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
 
 /// Load the dotenv file at build time, and transform all variables into constants within a module.
 ///
-/// Can parse publicity modifier for the module as the first argument.
+/// Can pass `filename = "path/to/.env"` to specify a custom path to the dotenv file.
+/// and `visibility = "<visibility modifier (eg. pub(crate))>"` to make the module public.
 #[proc_macro]
 pub fn dotenv_module(input: TokenStream) -> TokenStream {
     let mut path = ".env".to_owned();
-    let mut visibility = Visibility::Public(VisPublic {
-        pub_token: Default::default(),
-    });
+    let mut visibility = Visibility::Inherited;
 
     if !input.is_empty() {
         let args = Punctuated::<syn::Expr, Token![,]>::parse_terminated

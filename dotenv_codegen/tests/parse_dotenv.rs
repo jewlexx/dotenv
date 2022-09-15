@@ -2,7 +2,7 @@
 extern crate dotenv_codegen;
 
 mod private_module {
-    dotenv_module!(visibility = pub);
+    dotenv_module!(filename = ".env", visibility = "pub");
 }
 
 dotenv_module!();

@@ -80,16 +80,23 @@ pub fn dotenv_module(input: TokenStream) -> TokenStream {
     if !input.is_empty() {
         let args = Punctuated::<syn::Expr, Token![,]>::parse_terminated
             .parse(input)
-            .unwrap();
+            .expect("Could not parse arguments");
 
         for l in args.into_iter() {
             match l {
                 syn::Expr::Assign(expr) => {
                     let assigned = expr.left.to_token_stream().to_string();
                     if assigned == "visibility" {
-                        let literal = expr.right.to_token_stream();
+                        let literal =
+                            match litrs::StringLit::parse(expr.right.to_token_stream().to_string())
+                            {
+                                Ok(v) => v,
+                                Err(_) => panic!(),
+                            };
 
-                        visibility = syn::parse(literal.into()).unwrap();
+                        let value: TokenStream = literal.into_value().parse().unwrap();
+
+                        visibility = syn::parse(value).unwrap();
                     } else if assigned == "filename" {
                         let literal =
                             match litrs::StringLit::parse(expr.right.to_token_stream().to_string())

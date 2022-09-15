@@ -82,42 +82,15 @@ pub fn dotenv_module(input: TokenStream) -> TokenStream {
             .parse(input)
             .unwrap();
 
-        let mut iter = args.into_iter();
-
-        for l in iter {
+        for l in args.into_iter() {
             match l {
                 syn::Expr::Assign(expr) => {
-                    if expr.left.to_token_stream().to_string() == "visibility" {
+                    let assigned = expr.left.to_token_stream().to_string();
+                    if assigned == "visibility" {
                         let literal = expr.right.to_token_stream();
 
-                        syn::parse(literal.into()).unwrap()
-                    } else {
-                        Visibility::Public(VisPublic {
-                            pub_token: Default::default(),
-                        })
-                    }
-                }
-                _ => panic!(),
-            };
-
-            let vis = match iter.next().unwrap() {
-                syn::Expr::Assign(expr) => {
-                    if expr.left.to_token_stream().to_string() == "visibility" {
-                        let literal = expr.right.to_token_stream();
-
-                        syn::parse(literal.into()).unwrap()
-                    } else {
-                        Visibility::Public(VisPublic {
-                            pub_token: Default::default(),
-                        })
-                    }
-                }
-                _ => panic!(),
-            };
-
-            let path = match iter.next().unwrap() {
-                syn::Expr::Assign(expr) => {
-                    if expr.left.to_token_stream().to_string() == "filename" {
+                        visibility = syn::parse(literal.into()).unwrap();
+                    } else if assigned == "filename" {
                         let literal =
                             match litrs::StringLit::parse(expr.right.to_token_stream().to_string())
                             {
@@ -127,15 +100,11 @@ pub fn dotenv_module(input: TokenStream) -> TokenStream {
 
                         let value = literal.into_value();
 
-                        value.to_string()
-                    } else {
-                        ".env".to_owned()
+                        path = value.to_string();
                     }
                 }
                 _ => panic!(),
             };
-
-            (path, vis)
         }
     }
 

@@ -11,7 +11,6 @@ use syn::{parse_macro_input, Token, VisPublic, Visibility};
 /// Load the dotenv file at build time, and set the environment variables at runtime.
 #[proc_macro]
 pub fn dotenv_build(input: TokenStream) -> TokenStream {
-    let args = syn::parse_macro_input!(input);
     let (path, visibility) = if input.is_empty() {
         (
             ".env".to_owned(),
@@ -23,9 +22,12 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
         let args = Punctuated::<syn::Expr, Token![,]>::parse_terminated
             .parse(input)
             .unwrap();
+
         let mut iter = args.into_iter();
+
         let filename = match iter.next().unwrap() {
-            syn::Expr::Lit(syn::ExprLit {
+            syn::Expr::Assign(syn::ExprAssign {
+                left: syn::Lit::Str()
                 lit: syn::Lit::Str(s),
                 ..
             }) => s.value(),

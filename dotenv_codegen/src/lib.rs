@@ -1,5 +1,6 @@
 extern crate proc_macro;
 
+use std::convert::TryFrom;
 use std::env::{self, VarError};
 use std::path::Path;
 
@@ -24,7 +25,15 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
         match iter.next().unwrap() {
             syn::Expr::Assign(expr) => {
                 if expr.left.to_token_stream().to_string() == "filename" {
-                    expr.right.to_token_stream().to_string()
+                    let literal =
+                        match litrs::StringLit::parse(expr.right.to_token_stream().to_string()) {
+                            Ok(v) => v,
+                            Err(_) => panic!(),
+                        };
+
+                    let value = literal.into_value();
+
+                    value.to_string()
                 } else {
                     ".env".to_owned()
                 }
@@ -32,11 +41,6 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
             _ => panic!(),
         }
     };
-
-    return quote! {
-        compile_error!(#path);
-    }
-    .into();
 
     if let Ok((_, file)) = dotenv::find::Finder::new()
         .filename(Path::new(&path))

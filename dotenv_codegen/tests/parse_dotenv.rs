@@ -17,7 +17,7 @@ fn test_vars_at_build() {
 
 #[test]
 fn test_invalid_path() {
-    dotenv_build!(filename = ".env");
+    dotenv_build!(filename = ".env.invalid");
 }
 
 #[test]

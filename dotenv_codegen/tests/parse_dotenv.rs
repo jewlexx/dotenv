@@ -20,6 +20,13 @@ fn test_vars_at_build() {
 }
 
 #[test]
+fn test_private_vars() {
+    // assert_eq!(private_module::, "hello!");
+    // assert_eq!(private_module::CODEGEN_TEST_VAR2, "'quotes within quotes'");
+    // assert_eq!(private_module::CODEGEN_TEST_VAR3, "69");
+}
+
+#[test]
 fn test_custom_path() {
     dotenv_build!(filename = ".env");
 

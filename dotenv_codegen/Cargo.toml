@@ -3,9 +3,10 @@ proc-macro = true
 
 [package]
 
-name = "dotenv_codegen"
+name = "rotenv_codegen"
 version = "0.15.0"
 authors = [
+  "Juliette Cordor",
   "Santiago Lapresta <santiago.lapresta@gmail.com>",
   "Craig Hills <chills@gmail.com>",
   "Mike Piccolo <mfpiccolo@gmail.com>",

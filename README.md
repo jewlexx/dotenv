@@ -1,5 +1,7 @@
 # rust-dotenv
 
+A fork of dotenv, designed to work better with modern Rust, and design patterns.
+
 ![CI](https://github.com/dotenv-rs/dotenv/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/dotenv-rs/dotenv/branch/master/graph/badge.svg)](https://codecov.io/gh/dotenv-rs/dotenv)
 [![Crates.io](https://img.shields.io/crates/v/dotenv.svg)](https://crates.io/crates/dotenv)

@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate dotenv_codegen;
 
-mod private_module {
+pub mod private_module {
     dotenv_module!(filename = ".env", visibility = "pub");
 }
 
@@ -21,9 +21,10 @@ fn test_vars_at_build() {
 
 #[test]
 fn test_private_vars() {
-    // assert_eq!(private_module::, "hello!");
-    // assert_eq!(private_module::CODEGEN_TEST_VAR2, "'quotes within quotes'");
-    // assert_eq!(private_module::CODEGEN_TEST_VAR3, "69");
+    use private_module::dotenv_vars::*;
+    assert_eq!(CODEGEN_TEST_VAR1, "hello!");
+    assert_eq!(CODEGEN_TEST_VAR2, "'quotes within quotes'");
+    assert_eq!(CODEGEN_TEST_VAR3, "69");
 }
 
 #[test]

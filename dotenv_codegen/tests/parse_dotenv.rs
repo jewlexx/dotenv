@@ -5,7 +5,7 @@ pub mod private_module {
     dotenv_module!(filename = ".env", visibility = "pub");
 }
 
-dotenv_module!();
+dotenv_module!(visibility = "pub");
 
 #[test]
 fn test_vars_at_build() {

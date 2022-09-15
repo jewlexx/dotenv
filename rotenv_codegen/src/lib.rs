@@ -43,7 +43,7 @@ pub fn dotenv_build(input: TokenStream) -> TokenStream {
         }
     };
 
-    if let Ok((_, file)) = dotenv::find::Finder::new()
+    if let Ok((_, file)) = rotenv::find::Finder::new()
         .filename(Path::new(&path))
         .find()
     {
@@ -116,7 +116,7 @@ pub fn dotenv_module(input: TokenStream) -> TokenStream {
         }
     }
 
-    if let Ok((_, file)) = dotenv::find::Finder::new()
+    if let Ok((_, file)) = rotenv::find::Finder::new()
         .filename(Path::new(&path))
         .find()
     {
@@ -148,7 +148,7 @@ pub fn dotenv_module(input: TokenStream) -> TokenStream {
 /// Find a given variable in the dotenv file at build time
 #[proc_macro]
 pub fn dotenv(input: TokenStream) -> TokenStream {
-    if let Err(err) = dotenv::dotenv() {
+    if let Err(err) = rotenv::dotenv() {
         panic!("Error loading .env file: {}", err);
     }
 

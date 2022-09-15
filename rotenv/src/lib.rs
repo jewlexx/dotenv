@@ -35,7 +35,7 @@ static START: Once = Once::new();
 /// use dotenv;
 ///
 /// let key = "FOO";
-/// let value= dotenv::var(key).unwrap();
+/// let value= rotenv::var(key).unwrap();
 /// ```
 pub fn var<K: AsRef<OsStr>>(key: K) -> Result<String> {
     START.call_once(|| {
@@ -58,7 +58,7 @@ pub fn var<K: AsRef<OsStr>>(key: K) -> Result<String> {
 /// use dotenv;
 /// use std::io;
 ///
-/// let result: Vec<(String, String)> = dotenv::vars().collect();
+/// let result: Vec<(String, String)> = rotenv::vars().collect();
 /// ```
 pub fn vars() -> Vars {
     START.call_once(|| {
@@ -77,7 +77,7 @@ pub fn vars() -> Vars {
 /// use std::path::{Path};
 ///
 /// let my_path = env::home_dir().and_then(|a| Some(a.join("/.env"))).unwrap();
-/// dotenv::from_path(my_path.as_path());
+/// rotenv::from_path(my_path.as_path());
 /// ```
 pub fn from_path<P: AsRef<Path>>(path: P) -> Result<()> {
     let iter = Iter::new(File::open(path).map_err(Error::Io)?);
@@ -94,7 +94,7 @@ pub fn from_path<P: AsRef<Path>>(path: P) -> Result<()> {
 /// use std::path::{Path};
 ///
 /// let my_path = env::home_dir().and_then(|a| Some(a.join("/.env"))).unwrap();
-/// let iter = dotenv::from_path_iter(my_path.as_path()).unwrap();
+/// let iter = rotenv::from_path_iter(my_path.as_path()).unwrap();
 ///
 /// for item in iter {
 ///   let (key, val) = item.unwrap();
@@ -110,15 +110,15 @@ pub fn from_path_iter<P: AsRef<Path>>(path: P) -> Result<Iter<File>> {
 /// # Examples
 /// ```
 /// use dotenv;
-/// dotenv::from_filename("custom.env").ok();
+/// rotenv::from_filename("custom.env").ok();
 /// ```
 ///
-/// It is also possible to do the following, but it is equivalent to using `dotenv::dotenv()`,
+/// It is also possible to do the following, but it is equivalent to using `rotenv::dotenv()`,
 /// which is preferred.
 ///
 /// ```
 /// use dotenv;
-/// dotenv::from_filename(".env").ok();
+/// rotenv::from_filename(".env").ok();
 /// ```
 pub fn from_filename<P: AsRef<Path>>(filename: P) -> Result<PathBuf> {
     let (path, iter) = Finder::new().filename(filename.as_ref()).find()?;
@@ -131,15 +131,15 @@ pub fn from_filename<P: AsRef<Path>>(filename: P) -> Result<PathBuf> {
 /// # Examples
 /// ```
 /// use dotenv;
-/// dotenv::from_filename("custom.env").ok();
+/// rotenv::from_filename("custom.env").ok();
 /// ```
 ///
-/// It is also possible to do the following, but it is equivalent to using `dotenv::dotenv()`,
+/// It is also possible to do the following, but it is equivalent to using `rotenv::dotenv()`,
 /// which is preferred.
 ///
 /// ```no_run
 /// use dotenv;
-/// let iter = dotenv::from_filename_iter(".env").unwrap();
+/// let iter = rotenv::from_filename_iter(".env").unwrap();
 ///
 /// for item in iter {
 ///   let (key, val) = item.unwrap();
@@ -157,7 +157,7 @@ pub fn from_filename_iter<P: AsRef<Path>>(filename: P) -> Result<Iter<File>> {
 /// # Examples
 /// ```
 /// use dotenv;
-/// dotenv::dotenv().ok();
+/// rotenv::dotenv().ok();
 /// ```
 pub fn dotenv() -> Result<PathBuf> {
     let (path, iter) = Finder::new().find()?;
@@ -171,7 +171,7 @@ pub fn dotenv() -> Result<PathBuf> {
 /// ```no_run
 /// use dotenv;
 ///
-/// for item in dotenv::dotenv_iter().unwrap() {
+/// for item in rotenv::dotenv_iter().unwrap() {
 ///   let (key, val) = item.unwrap();
 ///   println!("{}={}", key, val);
 /// }

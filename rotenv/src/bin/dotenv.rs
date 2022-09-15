@@ -1,5 +1,5 @@
 extern crate clap;
-extern crate dotenv;
+extern crate rotenv;
 
 use clap::{App, AppSettings, Arg};
 use std::os::unix::process::CommandExt;
@@ -43,8 +43,8 @@ fn main() {
         .get_matches();
 
     match matches.value_of("FILE") {
-        None => dotenv::dotenv(),
-        Some(file) => dotenv::from_filename(file),
+        None => rotenv::dotenv(),
+        Some(file) => rotenv::from_filename(file),
     }
     .unwrap_or_else(|e| die!("error: failed to load environment: {}", e));
 

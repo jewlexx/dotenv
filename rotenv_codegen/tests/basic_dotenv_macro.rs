@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate dotenv_codegen;
+extern crate rotenv_codegen;
 
 #[test]
 fn dotenv_works() {

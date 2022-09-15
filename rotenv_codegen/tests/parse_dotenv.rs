@@ -1,5 +1,5 @@
 #[macro_use]
-extern crate dotenv_codegen;
+extern crate rotenv_codegen;
 
 pub mod private_module {
     dotenv_module!(filename = ".env", visibility = "pub");

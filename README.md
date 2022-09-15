@@ -1,4 +1,4 @@
-# rust-dotenv 
+# rust-dotenv
 
 ![CI](https://github.com/dotenv-rs/dotenv/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/dotenv-rs/dotenv/branch/master/graph/badge.svg)](https://codecov.io/gh/dotenv-rs/dotenv)
@@ -20,10 +20,9 @@ which setting environment variables is not practical. It loads environment
 variables from a `.env` file, if available, and mashes those with the actual
 environment variables provided by the operative system.
 
-Usage
-----
+## Usage
 
-The easiest and most common usage consists on calling `dotenv::dotenv` when the
+The easiest and most common usage consists on calling `rotenv::dotenv` when the
 application starts, which will load environment variables from a file named
 `.env` in the current directory or any of its parents; after that, you can just call
 the environment-related method you need as provided by `std::os`.
@@ -35,8 +34,7 @@ use the `from_filename` and `from_path` methods provided by the crate.
 behaves identically to `env!`, but first tries to load a `.env` file at compile
 time.
 
-Examples
-----
+## Examples
 
 A `.env` file looks like this:
 
@@ -54,7 +52,7 @@ A sample project using Dotenv would look like this:
 ```rust
 extern crate dotenv;
 
-use dotenv::dotenv;
+use rotenv::dotenv;
 use std::env;
 
 fn main() {
@@ -66,12 +64,10 @@ fn main() {
 }
 ```
 
-Variable substitution
-----
+## Variable substitution
 
 It's possible to reuse variables in the `.env` file using `$VARIABLE` syntax.
 The syntax and rules are similar to bash ones, here's the example:
-
 
 ```sh
 
@@ -87,11 +83,11 @@ RESULT=$VAR #value: 'one'
 # Double quotes do not affect the substitution
 RESULT="$VAR" #value: 'one'
 
-# Different syntax, same result 
+# Different syntax, same result
 RESULT=${VAR} #value: 'one'
 
 # Curly braces are useful in cases when we need to use a variable with non-alphanumeric name
-RESULT=$VAR_2 #value: 'one_2' since $ with no curly braces stops after first non-alphanumeric symbol 
+RESULT=$VAR_2 #value: 'one_2' since $ with no curly braces stops after first non-alphanumeric symbol
 RESULT=${VAR_2} #value: 'two'
 
 # The replacement can be escaped with either single quotes or a backslash:
@@ -106,9 +102,7 @@ RESULT=$PATH #value: the contents of the $PATH environment variable, even though
 
 Dotenv will parse the file, substituting the variables the way it's described in the comments.
 
-
-Using the `dotenv!` macro
-------------------------------------
+## Using the `dotenv!` macro
 
 Add `dotenv_codegen` to your dependencies, and add the following to the top of
 your crate:
